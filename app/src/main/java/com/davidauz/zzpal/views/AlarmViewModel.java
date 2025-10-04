@@ -1,4 +1,4 @@
-package com.davidauz.zzzpal2.views;
+package com.davidauz.zzpal.views;
 
 import android.app.Application;
 
@@ -6,10 +6,10 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.davidauz.zzzpal2.database.AlarmDatabase;
-import com.davidauz.zzzpal2.database.AlarmRepository;
-import com.davidauz.zzzpal2.entity.Alarm;
-import com.davidauz.zzzpal2.service.AppLogger;
+import com.davidauz.zzpal.database.AlarmDatabase;
+import com.davidauz.zzpal.database.AlarmRepository;
+import com.davidauz.zzpal.entity.Alarm;
+import com.davidauz.zzpal.service.AppLogger;
 
 import java.util.List;
 import java.util.concurrent.Executor;

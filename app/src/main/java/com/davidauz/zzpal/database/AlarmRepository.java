@@ -1,13 +1,12 @@
-package com.davidauz.zzzpal2.database;
+package com.davidauz.zzpal.database;
 
 import androidx.lifecycle.LiveData;
 
-import com.davidauz.zzzpal2.entity.Alarm;
-import com.davidauz.zzzpal2.entity.AlarmDao;
+import com.davidauz.zzpal.entity.Alarm;
+import com.davidauz.zzpal.entity.AlarmDao;
 
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class AlarmRepository {
     private AlarmDao alarmDao;

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.davidauz.zzzpal2"
+    namespace = "com.davidauz.zzpal"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.davidauz.zzzpal2"
+        applicationId = "com.davidauz.zzpal"
         minSdk = 34
         targetSdk = 34
         versionCode = 1

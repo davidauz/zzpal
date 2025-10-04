@@ -1,4 +1,4 @@
-package com.davidauz.zzzpal2.ui;
+package com.davidauz.zzpal.ui;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.davidauz.zzzpal2.R;
-import com.davidauz.zzzpal2.entity.Alarm;
+import com.davidauz.zzpal.R;
+import com.davidauz.zzpal.entity.Alarm;
 
 public class AlarmAdapter extends ListAdapter<Alarm, AlarmAdapter.AlarmViewHolder> {
 

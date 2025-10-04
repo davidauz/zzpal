@@ -1,12 +1,12 @@
-package com.davidauz.zzzpal2.database;
+package com.davidauz.zzpal.database;
 
 import android.content.Context;
 
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import com.davidauz.zzzpal2.entity.AlarmDao;
-import com.davidauz.zzzpal2.entity.Alarm;
+import com.davidauz.zzpal.entity.AlarmDao;
+import com.davidauz.zzpal.entity.Alarm;
 
 @Database(entities = {Alarm.class}, version = 3, exportSchema = false)
 public abstract class AlarmDatabase extends RoomDatabase {

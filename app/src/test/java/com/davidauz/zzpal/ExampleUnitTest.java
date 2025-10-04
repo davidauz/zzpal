@@ -1,4 +1,4 @@
-package com.davidauz.zzzpal2;
+package com.davidauz.zzpal;
 
 import org.junit.Test;
 

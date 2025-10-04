@@ -1,11 +1,11 @@
-package com.davidauz.zzzpal2.views;
+package com.davidauz.zzpal.views;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import androidx.core.content.ContextCompat;
-import com.davidauz.zzzpal2.service.AlarmService;
-import com.davidauz.zzzpal2.service.AppLogger;
+import com.davidauz.zzpal.service.AlarmService;
+import com.davidauz.zzpal.service.AppLogger;
 
 public class AlarmReceiver extends BroadcastReceiver {
 

@@ -1,4 +1,4 @@
-package com.davidauz.zzzpal2.entity;
+package com.davidauz.zzpal.entity;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;

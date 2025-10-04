@@ -1,15 +1,15 @@
-package com.davidauz.zzzpal2.entity;
+package com.davidauz.zzpal.entity;
 
-import static com.davidauz.zzzpal2.entity.Alarm.TYPE_ELAPSED;
-import static com.davidauz.zzzpal2.entity.Alarm.TYPE_FIXED;
-import static com.davidauz.zzzpal2.entity.Alarm.TYPE_RECURRING;
+import static com.davidauz.zzpal.entity.Alarm.TYPE_ELAPSED;
+import static com.davidauz.zzpal.entity.Alarm.TYPE_FIXED;
+import static com.davidauz.zzpal.entity.Alarm.TYPE_RECURRING;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import com.davidauz.zzzpal2.service.AppLogger;
-import com.davidauz.zzzpal2.views.AlarmReceiver;
+import com.davidauz.zzpal.service.AppLogger;
+import com.davidauz.zzpal.views.AlarmReceiver;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

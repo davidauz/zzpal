@@ -1,7 +1,7 @@
-package com.davidauz.zzzpal2;
+package com.davidauz.zzpal;
 
-import static com.davidauz.zzzpal2.entity.Alarm.TYPE_ELAPSED;
-import static com.davidauz.zzzpal2.entity.Alarm.TYPE_FIXED;
+import static com.davidauz.zzpal.entity.Alarm.TYPE_ELAPSED;
+import static com.davidauz.zzpal.entity.Alarm.TYPE_FIXED;
 
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
@@ -35,17 +35,16 @@ import android.widget.Toast;
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.davidauz.zzzpal2.entity.Alarm;
-import com.davidauz.zzzpal2.entity.AlarmScheduler;
-import com.davidauz.zzzpal2.service.AppLogger;
-import com.davidauz.zzzpal2.ui.AlarmAdapter;
-import com.davidauz.zzzpal2.views.AlarmViewModel;
+import com.davidauz.zzpal.entity.Alarm;
+import com.davidauz.zzpal.entity.AlarmScheduler;
+import com.davidauz.zzpal.service.AppLogger;
+import com.davidauz.zzpal.ui.AlarmAdapter;
+import com.davidauz.zzpal.views.AlarmViewModel;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

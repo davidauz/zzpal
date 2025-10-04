@@ -1,4 +1,4 @@
-package com.davidauz.zzzpal2.service;
+package com.davidauz.zzpal.service;
 
 import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;

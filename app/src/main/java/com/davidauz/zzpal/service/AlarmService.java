@@ -1,4 +1,4 @@
-package com.davidauz.zzzpal2.service;
+package com.davidauz.zzpal.service;
 
 
 import android.app.Notification;
@@ -19,12 +19,10 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
 import android.widget.Toast;
-
 import androidx.core.app.NotificationCompat;
 import androidx.core.os.HandlerCompat;
-
-import com.davidauz.zzzpal2.MainActivity;
-import com.davidauz.zzzpal2.R;
+import com.davidauz.zzpal.MainActivity;
+import com.davidauz.zzpal.R;
 
 import java.io.IOException;
 
@@ -55,7 +53,7 @@ public class AlarmService extends Service {
     private MediaPlayer mediaPlayer;
     private Vibrator vibrator;
     private PowerManager.WakeLock wakeLock;
-    private static final String WAKE_LOCK_TAG = "zzzpal:AlarmWakeLock";
+    private static final String WAKE_LOCK_TAG = "zzpal:AlarmWakeLock";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
