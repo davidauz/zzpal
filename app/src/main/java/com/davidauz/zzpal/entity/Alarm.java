@@ -20,8 +20,6 @@ public class Alarm {
     public String audioText;
     public boolean enabled;
 
-    public Alarm() {}
-
     public Alarm(int type, int hours, int minutes, int durationSeconds, boolean vibrate, String audioUri, String audioText, boolean enabled) {
         this.type=type;
         this.hours = hours;

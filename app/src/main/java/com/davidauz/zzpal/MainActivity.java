@@ -94,8 +94,6 @@ public class MainActivity extends ComponentActivity {
         ,   btnFixes=logsLayout.findViewById(R.id.btnFixes)
         ;
 
-        AppLogger.getInstance().log("onCreate");
-
         alarmList.setLayoutManager(new LinearLayoutManager(this));
 
         AlarmAdapter adapter = new AlarmAdapter
@@ -173,8 +171,9 @@ public class MainActivity extends ComponentActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
             if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
-                AppLogger.getInstance().log("MISSING 'IgnoringBatteryOptimizations'");
+                AppLogger.getInstance().log("MISSING 'IgnoringBatteryOptimizations': must allow background activity in Settings");
                 Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+
                 intent.setData(Uri.parse("package:" + getPackageName()));
                 startActivity(intent);
             } else
