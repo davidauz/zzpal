@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Map;
 
 /*
+Application life cycle:
+
 initialized -> onCreate ->
     created -> onStart (onRestart) ->
         started (is visible)-> onResumed ->
@@ -62,6 +64,19 @@ initialized -> onCreate ->
         started (is visible)-> onStop ->
     created-> onDestroy ->
 destroyed
+
+
+This is what this app is all about:
+* Schedule alarms with AlarmManager: it persists when the app is killed
+* Start AlarmService only when an alarm fires: it is a temporary execution
+* Stop the service immediately after, to preserve battery
+
+Key points:
+
+* When the app is swiped away the service is stopped, but AlarmManager alarms remains alert
+* When an alarm fires, the system creates a new process, calls the receiver, who in turn starts the service
+* After the service stops, the processes are killed again
+
 */
 
 public class MainActivity extends ComponentActivity {
