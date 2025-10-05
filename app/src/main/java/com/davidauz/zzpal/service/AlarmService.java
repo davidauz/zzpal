@@ -23,6 +23,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.os.HandlerCompat;
 import com.davidauz.zzpal.MainActivity;
 import com.davidauz.zzpal.R;
+import com.davidauz.zzpal.views.AlarmReceiver;
 
 import java.io.IOException;
 
@@ -53,57 +54,47 @@ public class AlarmService extends Service {
     private MediaPlayer mediaPlayer;
     private Vibrator vibrator;
     private PowerManager.WakeLock wakeLock;
-    private static final String WAKE_LOCK_TAG = "zzpal:AlarmWakeLock";
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-// Acquire Wake Lock to ensure that the CPU stays on while the alarm is being set up and run.
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
-// Acquire for the needed time
-        wakeLock.acquire(8 * 60 * 60 * 1000L);
-//                               |   |    |     |
-//                               |   |    |     +---one second
-//                               |   |    +---one minute
-//                               |   +---one hour
-//                               +---hours
+        try {
+            long alarmId = intent.getLongExtra("ALARM_ID", -1);
+            if (-1 != alarmId) {
+                Notification notification = createNotification(intent.getLongExtra("ALARM_ID", -1));
+                startForeground(NOTIFICATION_ID, notification);
 
-// ***************************************************************
-// **IMMEDIATELY** CALL startForeground()
-// this has to be at the absolute top of onStartCommand
-        createNotificationChannel();
-        Notification notification = createNotification(intent.getLongExtra("ALARM_ID", -1));
-        startForeground(NOTIFICATION_ID, notification);
-// ***************************************************************
-// Now the service is hopefully running in the foreground, protected
-// from being killed, so it is safe to process the rest of the data
-        AppLogger.getInstance().log("onStartCommand!");
+                AppLogger.getInstance().log("AlarmService Got alarm #" + alarmId);
+                int duration = intent.getIntExtra("DURATION", 60); // Default 60s
+                boolean vibrate = intent.getBooleanExtra("VIBRATE", false);
+                String audioUri = intent.getStringExtra("AUDIO_URI");
 
-        long alarmId = intent.getLongExtra("ALARM_ID", -1);
-        AppLogger.getInstance().log("Got alarm #"+alarmId);
-        int duration = intent.getIntExtra("DURATION", 60); // Default 60s
-        boolean vibrate = intent.getBooleanExtra("VIBRATE", false);
-        String audioUri = intent.getStringExtra("AUDIO_URI");
+                startAlarmSound(audioUri);
+                if (vibrate)
+                    startVibration(duration);
 
-        startAlarmSound(audioUri);
-        if (vibrate)
-            startVibration(duration);
-
-        Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
-        handler.postDelayed(() -> {
-            stopAlarm();
-            stopSelf();
-        }, duration * 1000L);
+                Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
+                handler.postDelayed(() -> {
+                    stopAlarm();
+                    stopSelf();
+                }, duration * 1000L);
+            }
+        }finally{
+            AlarmReceiver.releaseWakeLock();
+        }
         return START_STICKY;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        createNotificationChannel();
+        AppLogger.getInstance().log("AlarmService onCreate");
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     private void createNotificationChannel() {
+        AppLogger.getInstance().log("AlarmService createNotificationChannel");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
@@ -114,10 +105,6 @@ public class AlarmService extends Service {
             manager.createNotificationChannel(channel);
         }
     }
-
-
-
-
 
 
     private void startAlarmSound(String audioUri) {
@@ -170,7 +157,8 @@ public class AlarmService extends Service {
     }
 
     private Notification createNotification(long alarmId) {
-        // Create intent to open app when notification is tapped
+// Create intent to open app when notification is tapped
+        AppLogger.getInstance().log("AlarmService createNotification");
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this, 0, intent,
@@ -178,24 +166,26 @@ public class AlarmService extends Service {
         );
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Alarm Ringing")
-                .setContentText("Alarm ID: " + alarmId)
-                .setSmallIcon(R.drawable.ic_alarm) // Replace with your icon
-                .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_ALARM)
-                .build();
+            .setContentTitle("Alarm Ringing")
+            .setContentText("Alarm ID: " + alarmId)
+            .setSmallIcon(R.drawable.ic_alarm) // Replace with your icon
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .build();
     }
 
 
 
     @Override
     public IBinder onBind(Intent intent) {
+        AppLogger.getInstance().log("AlarmService onBind");
         return null;
     }
 
     @Override
     public void onDestroy() {
+        AppLogger.getInstance().log("AlarmService onDestroy");
         super.onDestroy();
 //must release wakelock
         if (wakeLock != null && wakeLock.isHeld()) {
@@ -203,4 +193,14 @@ public class AlarmService extends Service {
         }
         stopAlarm();
     }
+
+//    @Override not useful anyway
+//    public void onTaskRemoved(Intent rootIntent) {
+//        AppLogger.getInstance().log("AlarmService onTaskRemoved");
+//        Intent restartService = new Intent(this, AlarmService.class);
+//        restartService.setPackage(getPackageName());
+//        startService(restartService);
+//        super.onTaskRemoved(rootIntent);
+//    }
+
 }

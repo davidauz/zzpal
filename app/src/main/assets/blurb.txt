@@ -3,16 +3,18 @@ What if the alarm does not sound
 
 Recent Android versions need the following otherwise no alarms will work.
 
-First check the settings; the exact place changes between vendors so just look for the configuration string in Settings:
+Settings: the exact place changes between vendors so just look for the configuration string in Settings:
+
 1) Allow notifications from the app (usually in "App info")
 2) Unset "Pause app activity if unused"
 3) Set "Allow notifications even when Do Not Disturb is on"
 4) Add exception for the app in "Do Not Disturb" where it says "Apps in the exceptions list are allowed to interrupt Do Not Disturb"
 5) Crucial: "Allow background activity" (usually in "Power consumption controls")
-6) Look for the app in "Optimize battery use" and set it to "Don't optimize"
+6) Even more important: find the app in "Optimize battery use" and set it to "Don't optimize".
+   Usually in Settings > Battery > Battery Optimization
+7) Some manufacturers add specific "Special" permissions like "Alarms & reminders", enable the app in the settings.
 
-Second, if you swipe out the app it will no longer work because the system kills it.
-The app does not need to stay displayed (in foreground) but at least leave it in the background, i.e. yes you can use other apps.
-If everything else fails:
-adb shell dumpsys deviceidle disable
-this will disable doze mode (that is not particularly useful anyway)
+After all this the app should work even if it is swiped out.
+Sometimes the background service gets messed up; try "Force stop", or just reboot the phone.
+If still does not work, try this:   adb shell dumpsys deviceidle disable
+This will disable doze mode (that is not particularly useful anyway)

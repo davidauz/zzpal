@@ -35,6 +35,7 @@ import android.widget.Toast;
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -42,6 +43,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.davidauz.zzpal.entity.Alarm;
 import com.davidauz.zzpal.entity.AlarmScheduler;
+import com.davidauz.zzpal.service.AlarmService;
 import com.davidauz.zzpal.service.AppLogger;
 import com.davidauz.zzpal.ui.AlarmAdapter;
 import com.davidauz.zzpal.views.AlarmViewModel;
@@ -77,6 +79,7 @@ public class MainActivity extends ComponentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppLogger.init(this.getApplicationContext());
         setContentView(R.layout.activity_main);
 
         mainLayout = findViewById(R.id.main_layout);
@@ -163,7 +166,10 @@ public class MainActivity extends ComponentActivity {
         );
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (!canScheduleExactAlarms()) {
+            if (canScheduleExactAlarms()) {
+                AppLogger.getInstance().log("Can schedule exact alarms (good)");
+            }else{
+                AppLogger.getInstance().log("CANNOT SCHEDULE EXACT ALARMS");
                 showExactAlarmPermissionRationale();
             }
         }
@@ -212,6 +218,19 @@ public class MainActivity extends ComponentActivity {
         };
         IntentFilter filter = new IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
         getApplicationContext().registerReceiver(dozeReceiver, filter);
+        
+        startPersistentService();
+    }
+
+    private void startPersistentService() {
+//so the service lives even when the app is swiped out
+        Intent serviceIntent = new Intent(this, AlarmService.class);
+        AppLogger.getInstance().log("MainActivity startPersistentService");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
     }
 
     private void dumpdb() {
@@ -257,7 +276,7 @@ public class MainActivity extends ComponentActivity {
     }
 
     private void clearLogs() {
-        AppLogger.getInstance().clearLogTextView();
+        AppLogger.getInstance().clearLogTextView(true);
     }
 
     private void showLogsLayout() {
@@ -295,7 +314,7 @@ public class MainActivity extends ComponentActivity {
     }
 
     private void startAllActiveAlarms() {
-        AppLogger.getInstance().log("Starting all alarms");
+        AppLogger.getInstance().log("MainActivity Starting all alarms");
         List<Alarm> alarms = viewModel.getAllAlarms().getValue();
         if (alarms != null) {
             for (Alarm alarm : alarms) {
@@ -310,7 +329,7 @@ public class MainActivity extends ComponentActivity {
 
     private void stopAllActiveAlarms() {
         List<Alarm> alarms = viewModel.getAllAlarms().getValue();
-        AppLogger.getInstance().log("Stopping all alarms");
+        AppLogger.getInstance().log("MainActivity Stopping all alarms");
         if (alarms != null) {
             for (Alarm alarm : alarms) {
                 if (alarm.enabled) {
@@ -466,53 +485,53 @@ public class MainActivity extends ComponentActivity {
 
     @Override
     protected void onDestroy() {
-        AppLogger.getInstance().log("onDestroy called");
+        AppLogger.getInstance().log("MainActivity onDestroy");
         super.onDestroy();
-        AppLogger.getInstance().clearLogTextView();
+        AppLogger.getInstance().clearLogTextView(false);
     }
 
-//    @Override
-//    protected void onResume(){
-//        super.onResume();
-////brings the app to the foreground, and the user is now able to interact with it.
-////called at startup
-//        AppLogger.getInstance().log("onResume called");
-//    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+//brings the app to the foreground, and the user is now able to interact with it.
+//called at startup
+        AppLogger.getInstance().log("MainActivity onResume");
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        AppLogger.getInstance().log("MainActivity onSaveInstanceState");
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        AppLogger.getInstance().log("MainActivity onRestoreInstanceState");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AppLogger.getInstance().log("MainActivity onPause");
+    }
+
+    @Override protected void onRestart() {
+        super.onRestart();
+        AppLogger.getInstance().log("MainActivity onRestart");
+    }
 //
-//    @Override
-//    protected void onSaveInstanceState(@NonNull Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        AppLogger.getInstance().log("onSaveInstanceState called");
-//    }
 //
-//    @Override
-//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        AppLogger.getInstance().log("onRestoreInstanceState called");
-//    }
-//
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        AppLogger.getInstance().log("onPause called");
-//    }
-//
-//    @Override protected void onRestart() {
-//        super.onRestart();
-//        AppLogger.getInstance().log("onRestart called");
-//    }
-//
-//
-//    @Override protected void onStop() {
-//        super.onStop();
-//        AppLogger.getInstance().log("onStop called");
-//    }
-//
-//    @Override protected void onStart() {
-//        super.onStart(); // makes the app visible on the screen,
-//        AppLogger.getInstance().log("onStart called");
-////but the user is not yet able to interact with it.
-//    }
+    @Override protected void onStop() {
+        super.onStop();
+        AppLogger.getInstance().log("MainActivity onStop");
+    }
+
+    @Override protected void onStart() {
+        super.onStart(); // makes the app visible on the screen,
+        AppLogger.getInstance().log("MainActivity onStart");
+//but the user is not yet able to interact with it.
+    }
 
 }
 
