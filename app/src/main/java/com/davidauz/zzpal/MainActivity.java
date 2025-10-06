@@ -9,8 +9,10 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.usage.UsageStatsManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -22,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -35,7 +38,6 @@ import android.widget.Toast;
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -192,66 +194,94 @@ public class MainActivity extends ComponentActivity {
         );
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (canScheduleExactAlarms()) {
-                AppLogger.getInstance().log("Can schedule exact alarms (good)");
-            }else{
+            if (!canScheduleExactAlarms()) {
                 AppLogger.getInstance().log("CANNOT SCHEDULE EXACT ALARMS");
                 showExactAlarmPermissionRationale();
             }
         }
+        checkBatteryOptimization();
+        checkBackgroundRestricted();
+        checkNotificationsPolicy();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
-                AppLogger.getInstance().log("MISSING 'IgnoringBatteryOptimizations': must allow background activity in Settings");
-                Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+//        UsageStatsManager usm = (UsageStatsManager) getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE);
+//        AppLogger.getInstance().log("App Standby Bucket="+usm.getAppStandbyBucket()+" (low=best)");
+        checkNotificationsEnabled();
 
-                intent.setData(Uri.parse("package:" + getPackageName()));
-                startActivity(intent);
-            } else
-                AppLogger.getInstance().log("Ignoring Battery Optimizations (good)");
-        }
 
-        ActivityManager am = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-        if( am.isBackgroundRestricted() )
-            AppLogger.getInstance().log("Background restricted (not good)");
-        else
-            AppLogger.getInstance().log("Not background restricted (good)");
+//        BroadcastReceiver dozeReceiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+//                if( pm.isDeviceIdleMode() )
+//                    AppLogger.getInstance().log("Entering DOZE");
+//                else
+//                    AppLogger.getInstance().log("Not in DOZE");
+//            }
+//        };
+//        IntentFilter filter = new IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
+//        getApplicationContext().registerReceiver(dozeReceiver, filter);
 
+        startPersistentService(); // really necessary?
+    }
+
+    private void checkNotificationsEnabled() {
+        if ( !NotificationManagerCompat.from(getApplicationContext()).areNotificationsEnabled() )
+            myShowDialog("Notifications NOT enabled", "Please enable notifications for the app in Settings");
+    }
+
+    private void checkNotificationsPolicy() {
         NotificationManager nm = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         if(nm.isNotificationPolicyAccessGranted())
             AppLogger.getInstance().log("Notifications access granted (can override Do Not Disturb)");
         else
             AppLogger.getInstance().log("Notifications access NOT granted (can NOT override Do Not Disturb)");
+    }
 
-        UsageStatsManager usm = (UsageStatsManager) getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE);
-        AppLogger.getInstance().log("App Standby Bucket="+usm.getAppStandbyBucket()+" (low=best)");
+    private void checkBackgroundRestricted() {
+        ActivityManager am = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        if( am.isBackgroundRestricted() )
+            myShowDialog("App is background restricted", "Please allow the app to run background tasks in the Settings");
+    }
 
-        if ( NotificationManagerCompat.from(getApplicationContext()).areNotificationsEnabled() )
-            AppLogger.getInstance().log("Notifications enabled (good)");
-        else
-            AppLogger.getInstance().log("Notifications NOT enabled (not good)");
-
-        BroadcastReceiver dozeReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-                if( pm.isDeviceIdleMode() )
-                    AppLogger.getInstance().log("Entering DOZE");
-                else
-                    AppLogger.getInstance().log("Not in DOZE");
+    private void myShowDialog(String title, String body) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title)
+        .setMessage(body)
+        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
             }
-        };
-        IntentFilter filter = new IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
-        getApplicationContext().registerReceiver(dozeReceiver, filter);
+        })
+        ;
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
-        startPersistentService();
+    private void checkBatteryOptimization() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
+                try {
+                    myShowDialog("Battery Optimization missing","Please whitelist the app in 'Battery Optimization' as 'Don't optimize'");
+// will try to launch the appropriate Setting (does not work on some devices)
+                    AppLogger.getInstance().log("MISSING 'IgnoringBatteryOptimizations': must allow background activity in Settings");
+                    Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    if (intent.resolveActivity(getPackageManager()) != null)
+                        startActivity(intent);
+                    else
+                        AppLogger.getInstance().log("Battery optimization settings not available");
+                }catch(ActivityNotFoundException e) {
+                    Log.e("MainActivity", "Battery optimization settings not available");
+                }
+            }
+        }
     }
 
     private void startPersistentService() {
 //so the service lives even when the app is swiped out
         Intent serviceIntent = new Intent(this, AlarmService.class);
-        AppLogger.getInstance().log("MainActivity startPersistentService");
+//        AppLogger.getInstance().log("MainActivity startPersistentService");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent);
         } else {

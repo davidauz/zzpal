@@ -15,12 +15,13 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        try {
         acquireWakeLock(context);
         AppLogger.getInstance().log("Alarm received!");
         Intent service = new Intent(context, AlarmService.class);
         service.putExtras(intent); //  ! this starts the service only upon receiving the alarm
 
-        try {
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(service);
             } else {

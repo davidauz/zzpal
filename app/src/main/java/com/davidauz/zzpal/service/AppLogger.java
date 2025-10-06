@@ -36,6 +36,8 @@ public class AppLogger {
     }
 
     public static synchronized AppLogger getInstance() {
+        if(null==instance)
+            instance = new AppLogger(null);
         return instance;
     }
 
@@ -116,6 +118,8 @@ public class AppLogger {
 
     private File getLogFile() throws IOException {
         File logDir;
+        if(null==context)
+            return null;
 
         // Use external storage if available, otherwise internal storage
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -135,6 +139,8 @@ public class AppLogger {
         FileOutputStream fos = null;
         try {
             File logFile = getLogFile();
+            if(null==logFile)
+                return;
             fos = new FileOutputStream(logFile, true);
             fos.write(logMessage.getBytes());
         } catch (IOException e) {
@@ -156,7 +162,7 @@ public class AppLogger {
         StringBuilder sb = new StringBuilder();
         try {
             File logFile = getLogFile();
-            if (!logFile.exists())
+            if (null==logFile||!logFile.exists())
                 return sb;
 
             BufferedReader reader = new BufferedReader(new FileReader(logFile));

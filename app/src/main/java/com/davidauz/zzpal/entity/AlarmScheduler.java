@@ -80,7 +80,7 @@ public class AlarmScheduler {
 // https://developer.android.com/training/monitoring-device-state/doze-standby :
 // Alarms set with setAlarmClock() continue to fire normally. The system exits Doze shortly
 // before those alarms fire.
-                AppLogger.getInstance().log("using setAlarmClock");
+//                AppLogger.getInstance().log("using setAlarmClock");
                    AlarmManager.AlarmClockInfo alarmInfo = new AlarmManager.AlarmClockInfo(millis, showPendingIntent);
                 alarmManager.setAlarmClock(alarmInfo, pendingIntent);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

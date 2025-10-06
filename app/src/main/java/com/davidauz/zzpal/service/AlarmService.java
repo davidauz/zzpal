@@ -80,6 +80,8 @@ public class AlarmService extends Service {
                     stopSelf();
                 }, duration * 1000L);
             }
+        }catch(Exception e){
+            Log.e("AlarmService", e.getMessage());
         }finally{
             AlarmReceiver.releaseWakeLock();
         }
@@ -117,15 +119,19 @@ public class AlarmService extends Service {
     }
 
     private void createNotificationChannel() {
-        AppLogger.getInstance().log("AlarmService createNotificationChannel");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID,
-                "Alarm Channel",
-                NotificationManager.IMPORTANCE_HIGH
-            );
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
+        try {
+//            AppLogger.getInstance().log("AlarmService createNotificationChannel");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel(
+                        CHANNEL_ID,
+                        "Alarm Channel",
+                        NotificationManager.IMPORTANCE_HIGH
+                );
+                NotificationManager manager = getSystemService(NotificationManager.class);
+                manager.createNotificationChannel(channel);
+            }
+        } catch (Exception e) {
+            Log.e("AlarmService", e.getMessage());
         }
     }
 
