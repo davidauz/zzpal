@@ -77,6 +77,17 @@ Key points:
 * When an alarm fires, the system creates a new process, calls the receiver, who in turn starts the service
 * After the service stops, the processes are killed again
 
+
+Useful adb commands:
+* see scheduled alarms
+adb shell dumpsys alarm  | grep -i davidauz
+
+* see process
+adb shell ps | grep davidauz
+
+* see services
+adb shell dumpsys activity services | grep davidauz
+
 */
 
 public class MainActivity extends ComponentActivity {
@@ -233,7 +244,7 @@ public class MainActivity extends ComponentActivity {
         };
         IntentFilter filter = new IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
         getApplicationContext().registerReceiver(dozeReceiver, filter);
-        
+
         startPersistentService();
     }
 
@@ -500,53 +511,53 @@ public class MainActivity extends ComponentActivity {
 
     @Override
     protected void onDestroy() {
-        AppLogger.getInstance().log("MainActivity onDestroy");
+//        AppLogger.getInstance().log("MainActivity onDestroy");
         super.onDestroy();
         AppLogger.getInstance().clearLogTextView(false);
     }
 
-    @Override
-    protected void onResume(){
-        super.onResume();
-//brings the app to the foreground, and the user is now able to interact with it.
-//called at startup
-        AppLogger.getInstance().log("MainActivity onResume");
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        AppLogger.getInstance().log("MainActivity onSaveInstanceState");
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        AppLogger.getInstance().log("MainActivity onRestoreInstanceState");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        AppLogger.getInstance().log("MainActivity onPause");
-    }
-
-    @Override protected void onRestart() {
-        super.onRestart();
-        AppLogger.getInstance().log("MainActivity onRestart");
-    }
+//    @Override
+//    protected void onResume(){
+//        super.onResume();
+////brings the app to the foreground, and the user is now able to interact with it.
+////called at startup
+//        AppLogger.getInstance().log("MainActivity onResume");
+//    }
 //
+//    @Override
+//    protected void onSaveInstanceState(@NonNull Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        AppLogger.getInstance().log("MainActivity onSaveInstanceState");
+//    }
 //
-    @Override protected void onStop() {
-        super.onStop();
-        AppLogger.getInstance().log("MainActivity onStop");
-    }
-
-    @Override protected void onStart() {
-        super.onStart(); // makes the app visible on the screen,
-        AppLogger.getInstance().log("MainActivity onStart");
-//but the user is not yet able to interact with it.
-    }
+//    @Override
+//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        AppLogger.getInstance().log("MainActivity onRestoreInstanceState");
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        AppLogger.getInstance().log("MainActivity onPause");
+//    }
+//
+//    @Override protected void onRestart() {
+//        super.onRestart();
+//        AppLogger.getInstance().log("MainActivity onRestart");
+//    }
+////
+////
+//    @Override protected void onStop() {
+//        super.onStop();
+//        AppLogger.getInstance().log("MainActivity onStop");
+//    }
+//
+//    @Override protected void onStart() {
+//        super.onStart(); // makes the app visible on the screen,
+//        AppLogger.getInstance().log("MainActivity onStart");
+////but the user is not yet able to interact with it.
+//    }
 
 }
 

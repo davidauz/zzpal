@@ -45,7 +45,8 @@ needed—declaring it in the manifest is enough , but the user can still disable
             android:name=".service.AlarmService"
             android:foregroundServiceType="mediaPlayback"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            />
 
     </application>
 

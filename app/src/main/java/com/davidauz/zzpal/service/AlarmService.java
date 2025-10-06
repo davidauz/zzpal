@@ -1,6 +1,8 @@
 package com.davidauz.zzpal.service;
 
 
+import static com.davidauz.zzpal.views.AlarmReceiver.wakeLock;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -53,17 +55,16 @@ public class AlarmService extends Service {
     private static final String CHANNEL_ID = "ALARM_CHANNEL";
     private MediaPlayer mediaPlayer;
     private Vibrator vibrator;
-    private PowerManager.WakeLock wakeLock;
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             long alarmId = intent.getLongExtra("ALARM_ID", -1);
-            if (-1 != alarmId) {
-                Notification notification = createNotification(intent.getLongExtra("ALARM_ID", -1));
-                startForeground(NOTIFICATION_ID, notification);
 
+//            startForeground(NOTIFICATION_ID, notification);
+            if (-1 != alarmId) {
+                Notification notification = createNotification(alarmId);
                 AppLogger.getInstance().log("AlarmService Got alarm #" + alarmId);
                 int duration = intent.getIntExtra("DURATION", 60); // Default 60s
                 boolean vibrate = intent.getBooleanExtra("VIBRATE", false);
@@ -89,8 +90,30 @@ public class AlarmService extends Service {
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
-        AppLogger.getInstance().log("AlarmService onCreate");
+//        AppLogger.getInstance().log("AlarmService onCreate");
+        startForegroundWithValidNotification();
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    }
+
+    private void startForegroundWithValidNotification() {
+        Notification notification = buildValidNotification();
+        startForeground(NOTIFICATION_ID, notification);
+    }
+
+
+    private Notification buildValidNotification() {
+        // Create a valid notification builder with proper channel
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
+        builder.setSmallIcon(R.drawable.ic_alarm);
+        builder.setContentTitle("Alarm Service");
+        builder.setContentText("Running in background");
+        builder.setOngoing(true);
+        builder.setShowWhen(false);
+        builder.setAutoCancel(false);
+        builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+        builder.setCategory(Notification.CATEGORY_SERVICE);
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        return builder.build();
     }
 
     private void createNotificationChannel() {
@@ -156,6 +179,15 @@ public class AlarmService extends Service {
         }
     }
 
+
+    private Notification createNotification() {
+        return new NotificationCompat.Builder(this, "alarm_channel")
+            .setContentTitle("Alarm Service")
+            .setContentText("Alarm service is running")
+            .setSmallIcon(R.drawable.ic_alarm)
+            .build();
+    }
+
     private Notification createNotification(long alarmId) {
 // Create intent to open app when notification is tapped
         AppLogger.getInstance().log("AlarmService createNotification");
@@ -185,7 +217,7 @@ public class AlarmService extends Service {
 
     @Override
     public void onDestroy() {
-        AppLogger.getInstance().log("AlarmService onDestroy");
+//        AppLogger.getInstance().log("AlarmService onDestroy");
         super.onDestroy();
 //must release wakelock
         if (wakeLock != null && wakeLock.isHeld()) {
@@ -202,5 +234,15 @@ public class AlarmService extends Service {
 //        startService(restartService);
 //        super.onTaskRemoved(rootIntent);
 //    }
+
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        // 🔥 This is called when app is swiped from recents
+        // You can restart service here if needed
+        Intent restartService = new Intent(this, AlarmService.class);
+        startService(restartService);
+        super.onTaskRemoved(rootIntent);
+    }
 
 }
