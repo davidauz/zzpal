@@ -57,7 +57,7 @@ import java.util.List;
 import java.util.Map;
 
 /*
-Application life cycle:
+Let's review the application life cycle:
 
 initialized -> onCreate ->
     created -> onStart (onRestart) ->
@@ -69,15 +69,14 @@ destroyed
 
 
 This is what this app is all about:
-* Schedule alarms with AlarmManager: it persists when the app is killed
+* Schedule alarms with AlarmManager because it is supposed to persists when the app is killed
 * Start AlarmService only when an alarm fires: it is a temporary execution
 * Stop the service immediately after, to preserve battery
 
-Key points:
 
-* When the app is swiped away the service is stopped, but AlarmManager alarms remains alert
-* When an alarm fires, the system creates a new process, calls the receiver, who in turn starts the service
-* After the service stops, the processes are killed again
+When the app is swiped away the service is stopped, but AlarmManager alarms remains alert
+When an alarm fires, the system creates a new process, calls the receiver, who in turn starts the service
+After the service stops, the processes are killed again
 
 
 Useful adb commands:
@@ -143,8 +142,7 @@ public class MainActivity extends ComponentActivity {
                     , specuseGranted=permissions.getOrDefault("android.permission.FOREGROUND_SERVICE_SPECIAL_USE", false)
                     ;
 
-                    if (!postGranted || //!wakeLockGranted ||
-                    !specuseGranted) {
+                    if (!postGranted || !specuseGranted) {
                         Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -157,7 +155,6 @@ public class MainActivity extends ComponentActivity {
 
         addButtonFixed.setOnClickListener(v -> showDialogForNewFixedAlarm());
         addButtonElapsed.setOnClickListener(v -> showDialogForNewElapsedAlarm());
-//        addBtnRecurring.setOnClickListener(v -> showDialogForNewRecurringAlarm());
         startAllButton.setOnClickListener(v -> startAllActiveAlarms());
         stopAllButton.setOnClickListener(v -> stopAllActiveAlarms());
         showLogsButton.setOnClickListener(v->showLogsLayout());
@@ -203,11 +200,13 @@ public class MainActivity extends ComponentActivity {
         checkBackgroundRestricted();
         checkNotificationsPolicy();
 
+//not very useful
 //        UsageStatsManager usm = (UsageStatsManager) getApplicationContext().getSystemService(Context.USAGE_STATS_SERVICE);
 //        AppLogger.getInstance().log("App Standby Bucket="+usm.getAppStandbyBucket()+" (low=best)");
         checkNotificationsEnabled();
 
 
+//also not very useful
 //        BroadcastReceiver dozeReceiver = new BroadcastReceiver() {
 //            @Override
 //            public void onReceive(Context context, Intent intent) {
@@ -281,7 +280,6 @@ public class MainActivity extends ComponentActivity {
     private void startPersistentService() {
 //so the service lives even when the app is swiped out
         Intent serviceIntent = new Intent(this, AlarmService.class);
-//        AppLogger.getInstance().log("MainActivity startPersistentService");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent);
         } else {
@@ -310,7 +308,7 @@ public class MainActivity extends ComponentActivity {
         String fileContent="";
         try {
             AssetManager assetManager = getAssets();
-            InputStream inputStream = assetManager.open("blurb.txt"); // Replace with your file name
+            InputStream inputStream = assetManager.open("blurb.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder stringBuilder = new StringBuilder();
             String line;
@@ -318,7 +316,6 @@ public class MainActivity extends ComponentActivity {
                 stringBuilder.append(line).append('\n');
             }
             fileContent = stringBuilder.toString();
-            // Use fileContent as needed
             inputStream.close();
         } catch (Exception e) {
             fileContent=e.getMessage();
@@ -346,7 +343,7 @@ public class MainActivity extends ComponentActivity {
     private void requestMultiplePermissions() {
         multiplePermissionLauncher.launch(new String[]
                 {   "android.permission.POST_NOTIFICATIONS"
-//                ,   "android.permission.WAKE_LOCK"
+//                ,   "android.permission.WAKE_LOCK" apparently this is not necessary
                 ,   "android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
         });
     }
@@ -541,16 +538,16 @@ public class MainActivity extends ComponentActivity {
 
     @Override
     protected void onDestroy() {
-//        AppLogger.getInstance().log("MainActivity onDestroy");
         super.onDestroy();
         AppLogger.getInstance().clearLogTextView(false);
     }
 
+//following functions for debug purposes only
 //    @Override
 //    protected void onResume(){
 //        super.onResume();
-////brings the app to the foreground, and the user is now able to interact with it.
-////called at startup
+//brings the app to the foreground, and the user is now able to interact with it.
+//called at startup
 //        AppLogger.getInstance().log("MainActivity onResume");
 //    }
 //
@@ -576,8 +573,8 @@ public class MainActivity extends ComponentActivity {
 //        super.onRestart();
 //        AppLogger.getInstance().log("MainActivity onRestart");
 //    }
-////
-////
+//
+//
 //    @Override protected void onStop() {
 //        super.onStop();
 //        AppLogger.getInstance().log("MainActivity onStop");
@@ -586,7 +583,7 @@ public class MainActivity extends ComponentActivity {
 //    @Override protected void onStart() {
 //        super.onStart(); // makes the app visible on the screen,
 //        AppLogger.getInstance().log("MainActivity onStart");
-////but the user is not yet able to interact with it.
+//but the user is not yet able to interact with it.
 //    }
 
 }

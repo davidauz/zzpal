@@ -70,8 +70,7 @@ public class AlarmAdapter extends ListAdapter<Alarm, AlarmAdapter.AlarmViewHolde
         }
 
         public void bind(Alarm alrm, OnToggleListener toggleListener, OnDeleteListener deleteListener) {
-            labelView.setText(alrm.hours+":"+ alrm.minutes+" ("+
-                    (alrm.getTypeDescr())+"-"+alrm.durationSeconds+"s.)");
+            labelView.setText(alrm.getTypeDescr()+" - "+alrm.hours+"h:"+ alrm.minutes+"m, "+alrm.durationSeconds+"s.");
             toggleSwitch.setChecked(alrm.enabled);
 
             toggleSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

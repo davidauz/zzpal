@@ -50,7 +50,7 @@ public class AlarmScheduler {
             flags
         );
 
-        // Intent for when user taps the alarm in status bar
+// Intent for when user taps the alarm in status bar
         Intent showIntent = new Intent(context, MainActivity.class);
         showIntent.putExtra("ALARM_ID", alarm.id);
 
@@ -80,7 +80,6 @@ public class AlarmScheduler {
 // https://developer.android.com/training/monitoring-device-state/doze-standby :
 // Alarms set with setAlarmClock() continue to fire normally. The system exits Doze shortly
 // before those alarms fire.
-//                AppLogger.getInstance().log("using setAlarmClock");
                    AlarmManager.AlarmClockInfo alarmInfo = new AlarmManager.AlarmClockInfo(millis, showPendingIntent);
                 alarmManager.setAlarmClock(alarmInfo, pendingIntent);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -93,7 +92,7 @@ public class AlarmScheduler {
 
     public void cancelAlarm(long alarmId) {
         AppLogger.getInstance().log("Stopping alarm #"+alarmId);
-        Intent intent = new Intent(context, AlarmReceiver.class); // targets the receiver and not the service
+        Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("ALARM_ID", alarmId);
 
         int flags = PendingIntent.FLAG_UPDATE_CURRENT;

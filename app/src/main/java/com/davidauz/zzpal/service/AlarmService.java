@@ -32,23 +32,21 @@ import java.io.IOException;
 /*
 A Service is a component designed to perform long-running operations in the background,
 even when the app is not in the foreground (or even closed).
-Unlike Activity (which is tied to the UI and stops when the app is minimized), a Service runs
-independently of the user interface, making it useful for tasks that need to continue working
-when the app is in the background or terminated.
+Activity is tied to the UI; it stops when the app is minimized.
+A Service in stead runs independently of the user interface, making it useful for 
+tasks that need to continue working when the app is in the background or terminated.
 
 Services run on the main thread by default (but can spawn background threads for heavy work).
 The lifecycle is separate from activities (can outlive the app’s UI).
-Can be started with startService() (runs until explicitly stopped) or bound with bindService()
+Can be started with startService(), runs until explicitly stopped) or bound with bindService()
  (for ongoing interactions with other components).
 
-How a Service Solves the "Foreground-Only Alarm" Problem:
-Alarms (triggered via AlarmManager or WorkManager) can fail to fire reliably when the app is
-in the background or killed, due to Android’s power-saving features (e.g., Doze mode, app standby)
-or system constraints on background processes. A Service helps address this by:
-* Maintaining a persistent background presence: Ensuring the app has a active component running,
-making it less likely for the system to ignore alarm triggers.
-* Handling alarm logic reliably: Receiving alarm intents and executing critical actions (e.g.,
-showing notifications, vibrating) even when the app is not visible.
+A Service can solve the problem of the alarm only ringing when the app is in foreground,
+i.e. alarms can fail to fire reliably when the app is in the background or killed, due 
+to Android’s power-saving features (e.g., Doze mode, app standby) or system constraints 
+on background processes. A Service maintains a persistent background presence, ensuring 
+that the app has a active component running, making it less likely for the system to ignore 
+alarm triggers.
 */
 public class AlarmService extends Service {
     private static final int NOTIFICATION_ID = 123;
@@ -62,7 +60,6 @@ public class AlarmService extends Service {
         try {
             long alarmId = intent.getLongExtra("ALARM_ID", -1);
 
-//            startForeground(NOTIFICATION_ID, notification);
             if (-1 != alarmId) {
                 Notification notification = createNotification(alarmId);
                 AppLogger.getInstance().log("AlarmService Got alarm #" + alarmId);
@@ -92,7 +89,6 @@ public class AlarmService extends Service {
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
-//        AppLogger.getInstance().log("AlarmService onCreate");
         startForegroundWithValidNotification();
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
@@ -104,7 +100,6 @@ public class AlarmService extends Service {
 
 
     private Notification buildValidNotification() {
-        // Create a valid notification builder with proper channel
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
         builder.setSmallIcon(R.drawable.ic_alarm);
         builder.setContentTitle("Alarm Service");
@@ -120,7 +115,6 @@ public class AlarmService extends Service {
 
     private void createNotificationChannel() {
         try {
-//            AppLogger.getInstance().log("AlarmService createNotificationChannel");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel(
                         CHANNEL_ID,
@@ -195,7 +189,6 @@ public class AlarmService extends Service {
     }
 
     private Notification createNotification(long alarmId) {
-// Create intent to open app when notification is tapped
         AppLogger.getInstance().log("AlarmService createNotification");
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -223,7 +216,6 @@ public class AlarmService extends Service {
 
     @Override
     public void onDestroy() {
-//        AppLogger.getInstance().log("AlarmService onDestroy");
         super.onDestroy();
 //must release wakelock
         if (wakeLock != null && wakeLock.isHeld()) {
@@ -232,20 +224,10 @@ public class AlarmService extends Service {
         stopAlarm();
     }
 
-//    @Override not useful anyway
-//    public void onTaskRemoved(Intent rootIntent) {
-//        AppLogger.getInstance().log("AlarmService onTaskRemoved");
-//        Intent restartService = new Intent(this, AlarmService.class);
-//        restartService.setPackage(getPackageName());
-//        startService(restartService);
-//        super.onTaskRemoved(rootIntent);
-//    }
-
-
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        // 🔥 This is called when app is swiped from recents
-        // You can restart service here if needed
+// This is called when app is swiped from recents
+// Let's restart the service here
         Intent restartService = new Intent(this, AlarmService.class);
         startService(restartService);
         super.onTaskRemoved(rootIntent);

@@ -22,7 +22,7 @@ public abstract class AlarmDatabase extends RoomDatabase {
                             context.getApplicationContext(),
                             AlarmDatabase.class,
                             "alarm_database"
-                    ).fallbackToDestructiveMigration() // when increasing the version number
+                    ).fallbackToDestructiveMigration()
                     .build();
                 }
             }

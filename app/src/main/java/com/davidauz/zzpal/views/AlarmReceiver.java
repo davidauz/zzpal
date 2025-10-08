@@ -19,7 +19,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         acquireWakeLock(context);
         AppLogger.getInstance().log("Alarm received!");
         Intent service = new Intent(context, AlarmService.class);
-        service.putExtras(intent); //  ! this starts the service only upon receiving the alarm
+        service.putExtras(intent);
 
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -36,12 +36,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     private static void acquireWakeLock(Context context) {
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
-        wakeLock.acquire(          1 * 60); // not ringing for more than one minute
-//                               |   |    |     |
-//                               |   |    |     +---one second
-//                               |   |    +---one minute
-//                               |   +---one hour
-//                               +---hours
+        wakeLock.acquire(30); // not ringing for more than 30 seconds
     }
 
     public static void releaseWakeLock() {

@@ -20,7 +20,7 @@ public class AppLogger {
     private static AppLogger instance;
     private TextView logTextView;
     private StringBuilder logBuffer;
-    private static final int MAX_LOG_LINES = 100; // Prevent memory issues
+    private static final int MAX_LOG_LINES = 100; // to prevent memory issues
     private Context context;
 
     private AppLogger(Context con) {
@@ -28,7 +28,7 @@ public class AppLogger {
         context=con;
     }
 
-//to be called in mainActivity.onStart
+//to be called in mainActivity.onStart because needs context
     public static synchronized void init(Context con) {
         instance = new AppLogger(con);
         instance.logBuffer=instance.readLogs();
@@ -44,7 +44,6 @@ public class AppLogger {
     public void setLogTextView(TextView textView) {
         logTextView = textView;
         logTextView.setMovementMethod(new ScrollingMovementMethod());
-        // Display existing logs when TextView becomes available
         if (logTextView != null && logBuffer.length() > 0) {
             logTextView.setText(logBuffer.toString());
         }
@@ -121,7 +120,6 @@ public class AppLogger {
         if(null==context)
             return null;
 
-        // Use external storage if available, otherwise internal storage
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             logDir = new File(context.getExternalFilesDir(null), LOG_DIR);
         } else {
